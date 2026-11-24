@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Razorpay Test Payment - Library Management System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 30px 15px;
+            color: #333;
+        }
+        .container {
+            max-width: 650px;
+            margin: 30px auto;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .badge-test {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #3730a3;
+            font-weight: bold;
+            font-size: 13px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+        h1 {
+            margin: 0 0 10px;
+            font-size: 24px;
+            color: #1e293b;
+        }
+        .amount-tag {
+            font-size: 32px;
+            font-weight: bold;
+            color: #0d6efd;
+            margin: 15px 0 25px;
+        }
+        .instructions {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: left;
+            margin-bottom: 25px;
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.6;
+        }
+        .instructions h3 {
+            margin: 0 0 8px;
+            font-size: 14px;
+            color: #0f172a;
+        }
+        .instructions ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .instructions code {
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        .btn-pay {
+            background: #0d6efd;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+        }
+        .btn-pay:hover {
+            background: #0b5ed7;
+        }
+        .cancel-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .cancel-link:hover {
+            color: #dc3545;
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <span class="badge-test">⚡ RAZORPAY TEST MODE DEMO</span>
+        <h1>Complete Your Online Payment</h1>
+        <p style="color: #64748b; margin: 0;">Library Book Order</p>
+
+        <div class="amount-tag">₹{{ total_amount }}</div>
+
+        <div class="instructions">
+            <h3>🎓 Official Razorpay Test Credentials (College Demo):</h3>
+            <ul>
+                <li><strong>Card Number:</strong> <code>4111 1111 1111 1111</code> (or any valid test card)</li>
+                <li><strong>Expiry:</strong> Any future date (e.g., <code>12/28</code>)</li>
+                <li><strong>CVV:</strong> <code>123</code></li>
+                <li><strong>OTP:</strong> Click "Success" or enter <code>123456</code> on the test screen</li>
+                <li><em>Notice: Real credit/debit cards are not charged in Test Mode.</em></li>
+            </ul>
+        </div>
+
+        <button id="rzp-button" class="btn-pay">
+            🚀 Open Razorpay Test Payment Modal
+        </button>
+
+        <div>
+            <a class="cancel-link" href="{{ failed_url }}?reason=cancelled">
+                ← Cancel & Return to Cart
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden verification form submitted on Razorpay success -->
+<form id="razorpay-verification-form" method="POST" action="{{ verify_url }}" style="display: none;">
+    {% csrf_token %}
+    <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+    <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+    <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+</form>
+
+<!-- Razorpay Official Checkout Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    const options = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ amount_in_paise }}",
+        "currency": "INR",
+        "name": "Library Management System",
+        "description": "Order Payment (Test Mode)",
+        "order_id": "{{ razorpay_order_id }}",
+        "handler": function (response) {
+            // Securely pass payment details to server for signature verification
+            document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+            document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+            document.getElementById('razorpay_signature').value = response.razorpay_signature;
+
+            const btn = document.getElementById('rzp-button');
+            btn.innerHTML = '<span class="spinner"></span> Verifying payment on server...';
+            btn.disabled = true;
+
+            document.getElementById('razorpay-verification-form').submit();
+        },
+        "prefill": {
+            "name": "{{ delivery.customer_name|escapejs }}",
+            "email": "{{ delivery.customer_email|escapejs }}",
+            "contact": "{{ delivery.mobile|escapejs }}"
+        },
+        "theme": {
+            "color": "#0d6efd"
+        },
+        "modal": {
+            "ondismiss": function() {
+                // If the user closes the modal without completing payment
+                window.location.href = "{{ failed_url }}?reason=cancelled";
+            }
+        }
+    };
+
+    const rzp = new Razorpay(options);
+
+    rzp.on('payment.failed', function (response) {
+        const desc = encodeURIComponent(response.error.description || 'Payment Failed');
+        const code = encodeURIComponent(response.error.code || '');
+        window.location.href = "{{ failed_url }}?reason=failed&description=" + desc + "&code=" + code;
+    });
+
+    document.getElementById('rzp-button').onclick = function(e){
+        rzp.open();
+        e.preventDefault();
+    };
+
+    // Auto-open modal on page load for seamless experience
+    window.onload = function() {
+        rzp.open();
+    };
+</script>
+
+</body>
+</html>

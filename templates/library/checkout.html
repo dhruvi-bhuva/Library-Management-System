@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout - Library Management System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 25px 15px;
+            color: #333;
+        }
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+        }
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .back-link {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            font-size: 15px;
+        }
+        .back-link:hover {
+            color: #0d6efd;
+        }
+        .demo-badge {
+            background: #ffc107;
+            color: #212529;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        h1 {
+            text-align: center;
+            color: #222;
+            margin: 0 0 25px;
+            font-size: 28px;
+        }
+        .checkout-layout {
+            display: grid;
+            grid-template-columns: 1.25fr 0.75fr;
+            gap: 25px;
+            align-items: start;
+        }
+        @media (max-width: 800px) {
+            .checkout-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            border: 1px solid #e5e7eb;
+        }
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 18px;
+            font-size: 20px;
+            color: #111;
+            border-bottom: 2px solid #f1f3f5;
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .alert-error {
+            background: #fde8e8;
+            border: 1px solid #f8b4b4;
+            color: #9b1c1c;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #444;
+        }
+        .required {
+            color: #dc3545;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        textarea {
+            width: 100%;
+            padding: 11px 13px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13,110,253,0.15);
+        }
+        .error-field {
+            border-color: #dc3545 !important;
+            background-color: #fff8f8;
+        }
+        .field-error {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+        /* Payment Options */
+        .payment-options {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 10px;
+        }
+        .payment-option-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: all 0.2s;
+            background: #fff;
+        }
+        .payment-option-card:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+        .payment-option-card.selected {
+            border-color: #198754;
+            background: #f0fdf4;
+        }
+        .payment-option-card.selected.online-selected {
+            border-color: #0d6efd;
+            background: #eff6ff;
+        }
+        .payment-option-card input[type="radio"] {
+            margin-top: 4px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            accent-color: #198754;
+        }
+        .payment-option-card.online-selected input[type="radio"] {
+            accent-color: #0d6efd;
+        }
+        .payment-info {
+            flex: 1;
+        }
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .payment-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .payment-desc {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+        .badge-pill {
+            font-size: 11px;
+            font-weight: bold;
+            padding: 3px 9px;
+            border-radius: 12px;
+            letter-spacing: 0.5px;
+        }
+        .badge-green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .badge-blue {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        .badge-disabled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .notice-unconfigured {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            color: #c53030;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+        /* Order Items in Summary */
+        .summary-items {
+            max-height: 280px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 5px;
+        }
+        .summary-item {
+            display: flex;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f3f5;
+            align-items: center;
+        }
+        .summary-item img {
+            width: 50px;
+            height: 65px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .summary-item .no-img {
+            width: 50px;
+            height: 65px;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #777;
+            border-radius: 4px;
+            text-align: center;
+            padding: 2px;
+        }
+        .summary-item-info {
+            flex: 1;
+        }
+        .summary-item-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 3px;
+            color: #222;
+        }
+        .summary-item-meta {
+            font-size: 12px;
+            color: #666;
+        }
+        .summary-item-subtotal {
+            font-weight: bold;
+            font-size: 14px;
+            color: #111;
+        }
+        .summary-totals {
+            border-top: 2px solid #e9ecef;
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+        .summary-line.grand-total {
+            border-top: 1px dashed #ccc;
+            padding-top: 12px;
+            margin-top: 10px;
+            font-size: 19px;
+            font-weight: bold;
+            color: #198754;
+        }
+        .free-badge {
+            color: #198754;
+            font-weight: bold;
+        }
+        .submit-btn {
+            width: 100%;
+            background: #198754;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+            transition: all 0.2s;
+        }
+        .submit-btn:disabled {
+            background: #9ca3af !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+            opacity: 0.85;
+        }
+        .submit-btn:hover:not(:disabled) {
+            filter: brightness(0.92);
+        }
+        .button-help {
+            font-size: 12px;
+            text-align: center;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 18px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-nav">
+        <a class="back-link" href="{% url 'cart' %}">← Back to Cart</a>
+        <div class="demo-badge">🎓 College Demo Mode</div>
+    </div>
+
+    <h1>🔒 Secure Checkout</h1>
+
+    {% if errors.general %}
+        <div class="alert-error">
+            <strong>Notice:</strong> {{ errors.general }}
+        </div>
+    {% endif %}
+
+    {% if errors.payment_method %}
+        <div class="alert-error">
+            <strong>Payment Notice:</strong> {{ errors.payment_method }}
+        </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'checkout' %}" id="checkout-form">
+        {% csrf_token %}
+
+        <div class="checkout-layout">
+            <!-- LEFT COLUMN: Delivery Details & Payment Selection -->
+            <div>
+                <!-- Delivery Details Card -->
+                <div class="card" style="margin-bottom: 25px;">
+                    <h2>📍 1. Delivery Details</h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="customer_name">Full Name <span class="required">*</span></label>
+                            <input
+                                type="text"
+                                id="customer_name"
+                                name="customer_name"
+                                value="{{ form_data.customer_name|default:'' }}"
+                                placeholder="e.g. Rahul Sharma"
+                                required
+                                class="{% if errors.customer_name %}error-field{% endif %}"
+                            >
+                            {% if errors.customer_name %}
+                                <div class="field-error">{{ errors.customer_name }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mobile">Mobile Number (10 digits) <span class="required">*</span></label>
+                            <input
+                                type="tel"
+                                id="mobile"
+                                name="mobile"
+                                maxlength="10"
+                                value="{{ form_data.mobile|default:'' }}"
+                                placeholder="e.g. 9876543210"
+                                required
+                                class="{% if errors.mobile %}error-field{% endif %}"
+                            >
+                            {% if errors.mobile %}
+                                <div class="field-error">{{ errors.mobile }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer_email">Email Address (Optional for e-receipt)</label>
+                        <input
+                            type="email"
+                            id="customer_email"
+                            name="customer_email"
+                            value="{{ form_data.customer_email|default:'' }}"
+                            placeholder="e.g. rahul@example.com"
+                            class="{% if errors.customer_email %}error-field{% endif %}"
+                        >
+                        {% if errors.customer_email %}
+                            <div class="field-error">{{ errors.customer_email }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Delivery Address (House/Street/Area) <span class="required">*</span></label>
+                        <textarea
+                            id="address"
+                            name="address"
+                            rows="3"
+                            placeholder="e.g. Flat 402, Green Valley Apartments, MG Road"
+                            required
+                            class="{% if errors.address %}error-field{% endif %}"
+                        >{{ form_data.address|default:'' }}</textarea>
+                        {% if errors.address %}
+                            <div class="field-error">{{ errors.address }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City <span class="required">*</span></label>
+                            <input
+                                type="text"
+                                id="city"
+                                name="city"
+                                value="{{ form_data.city|default:'' }}"
+                                placeholder="e.g. Mumbai"
+                                required
+                                class="{% if errors.city %}error-field{% endif %}"
+                            >
+                            {% if errors.city %}
+                                <div class="field-error">{{ errors.city }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="state">State <span class="required">*</span></label>
+                            <input
+                                type="text"
+                                id="state"
+                                name="state"
+                                value="{{ form_data.state|default:'' }}"
+                                placeholder="e.g. Maharashtra"
+                                required
+                                class="{% if errors.state %}error-field{% endif %}"
+                            >
+                            {% if errors.state %}
+                                <div class="field-error">{{ errors.state }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pincode">PIN Code (6 digits) <span class="required">*</span></label>
+                            <input
+                                type="text"
+                                id="pincode"
+                                name="pincode"
+                                maxlength="6"
+                                value="{{ form_data.pincode|default:'' }}"
+                                placeholder="e.g. 400001"
+                                required
+                                class="{% if errors.pincode %}error-field{% endif %}"
+                            >
+                            {% if errors.pincode %}
+                                <div class="field-error">{{ errors.pincode }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method Card -->
+                <div class="card">
+                    <h2>💳 2. Payment Options</h2>
+
+                    <div class="payment-options">
+                        <!-- Option 1: Cash on Delivery (COD) -->
+                        <label class="payment-option-card {% if form_data.payment_method == 'COD' or not form_data.payment_method %}selected{% endif %}" id="option-cod">
+                            <input
+                                type="radio"
+                                name="payment_method"
+                                id="pm-cod"
+                                value="COD"
+                                {% if form_data.payment_method == 'COD' or not form_data.payment_method %}checked{% endif %}
+                                onchange="onPaymentMethodChange()"
+                            >
+                            <div class="payment-info">
+                                <div class="payment-header">
+                                    <span class="payment-title">💵 Cash on Delivery (COD)</span>
+                                    <span class="badge-pill badge-green">✔ Ready (No Keys Required)</span>
+                                </div>
+                                <div class="payment-desc">
+                                    Pay cash directly upon delivery of your books. Works instantly without configuring any payment gateway keys.
+                                </div>
+                            </div>
+                        </label>
+
+                        <!-- Option 2: Razorpay Online Payment -->
+                        <label class="payment-option-card {% if form_data.payment_method == 'ONLINE' %}selected online-selected{% endif %}" id="option-online">
+                            <input
+                                type="radio"
+                                name="payment_method"
+                                id="pm-online"
+                                value="ONLINE"
+                                {% if form_data.payment_method == 'ONLINE' %}checked{% endif %}
+                                onchange="onPaymentMethodChange()"
+                            >
+                            <div class="payment-info">
+                                <div class="payment-header">
+                                    <span class="payment-title">⚡ Online Payment (Razorpay Test Mode)</span>
+                                    {% if razorpay_configured %}
+                                        <span class="badge-pill badge-blue">TEST MODE READY</span>
+                                    {% else %}
+                                        <span class="badge-pill badge-disabled">CREDENTIALS MISSING</span>
+                                    {% endif %}
+                                </div>
+                                <div class="payment-desc">
+                                    Pay online via Razorpay Sandbox (UPI, Test Cards, Netbanking). No real charges.
+                                </div>
+
+                                {% if not razorpay_configured %}
+                                    <div class="notice-unconfigured">
+                                        ⚠️ <strong>Test Credentials Unavailable:</strong> Razorpay Test API keys (<code>RAZORPAY_KEY_ID</code> and <code>RAZORPAY_KEY_SECRET</code>) are not configured in your <code>.env</code> file. Online payment initiation is disabled. Please select <strong>Cash on Delivery (COD)</strong> above to place your order.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Order Summary -->
+            <div>
+                <div class="card" style="position: sticky; top: 20px;">
+                    <h2>📚 Order Summary</h2>
+
+                    <!-- Items List -->
+                    <div class="summary-items">
+                        {% for item in cart.items %}
+                            <div class="summary-item">
+                                {% if item.book.image %}
+                                    <img src="{{ item.book.image.url }}" alt="{{ item.book.title }}">
+                                {% else %}
+                                    <div class="no-img">No Image</div>
+                                {% endif %}
+
+                                <div class="summary-item-info">
+                                    <div class="summary-item-title">{{ item.book.title }}</div>
+                                    <div class="summary-item-meta">
+                                        ₹{{ item.book.price }} × {{ item.quantity }}
+                                    </div>
+                                </div>
+
+                                <div class="summary-item-subtotal">
+                                    ₹{{ item.subtotal }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Totals -->
+                    <div class="summary-totals">
+                        <div class="summary-line">
+                            <span>Total Items:</span>
+                            <span>{{ cart.total_quantity }} book{{ cart.total_quantity|pluralize }}</span>
+                        </div>
+                        <div class="summary-line">
+                            <span>Subtotal:</span>
+                            <span>₹{{ cart.total_amount }}</span>
+                        </div>
+                        <div class="summary-line">
+                            <span>Standard Delivery:</span>
+                            <span class="free-badge">FREE</span>
+                        </div>
+                        <div class="summary-line grand-total">
+                            <span>Total Payable:</span>
+                            <span id="display-total">₹{{ cart.total_amount }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Submit Button -->
+                    <button type="submit" class="submit-btn" id="submit-btn">
+                        Place Order (Cash on Delivery)
+                    </button>
+
+                    <div class="button-help" id="button-help">
+                        ✔ Cash on Delivery will save your order directly with <strong>Pending</strong> payment status.
+                    </div>
+
+                    <div class="trust-badges">
+                        <span>🔒 100% Secure Checkout</span>
+                        <span>📦 Fast College Delivery</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    const isRazorpayConfigured = {{ razorpay_configured|yesno:"true,false" }};
+
+    function onPaymentMethodChange() {
+        const codRadio = document.getElementById('pm-cod');
+        const onlineRadio = document.getElementById('pm-online');
+        const codCard = document.getElementById('option-cod');
+        const onlineCard = document.getElementById('option-online');
+        const submitBtn = document.getElementById('submit-btn');
+        const buttonHelp = document.getElementById('button-help');
+        const total = '{{ cart.total_amount }}';
+
+        if (onlineRadio && onlineRadio.checked) {
+            codCard.classList.remove('selected');
+            onlineCard.classList.add('selected', 'online-selected');
+
+            if (isRazorpayConfigured) {
+                submitBtn.disabled = false;
+                submitBtn.style.background = '#0d6efd';
+                submitBtn.textContent = 'Proceed to Pay ₹' + total + ' (Razorpay Test Mode)';
+                buttonHelp.innerHTML = '🔒 Secure Razorpay Sandbox Test Checkout';
+                buttonHelp.style.color = '#0d6efd';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.style.background = '#9ca3af';
+                submitBtn.textContent = '🚫 Online Payment Disabled (Missing Razorpay Keys)';
+                buttonHelp.innerHTML = '⚠️ Test credentials unavailable. Please select <strong>Cash on Delivery (COD)</strong> above to place your order.';
+                buttonHelp.style.color = '#dc2626';
+            }
+        } else {
+            onlineCard.classList.remove('selected', 'online-selected');
+            codCard.classList.add('selected');
+
+            submitBtn.disabled = false;
+            submitBtn.style.background = '#198754';
+            submitBtn.textContent = 'Place Order (Cash on Delivery)';
+            buttonHelp.innerHTML = '✔ Cash on Delivery will save your order directly with <strong>Pending</strong> payment status.';
+            buttonHelp.style.color = '#15803d';
+        }
+    }
+
+    // Initialize button state on page load based on current selection
+    document.addEventListener('DOMContentLoaded', function() {
+        onPaymentMethodChange();
+    });
+</script>
+
+</body>
+</html>

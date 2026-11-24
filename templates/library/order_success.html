@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed - Library Management System</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px 15px;
+            color: #333;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .success-card {
+            background: white;
+            border-radius: 12px;
+            padding: 35px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+        }
+        .checkmark-circle {
+            width: 70px;
+            height: 70px;
+            background: #d1fae5;
+            color: #059669;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 15px;
+        }
+        h1 { color: #0f172a; margin: 0 0 8px; font-size: 26px; }
+        .subtitle { color: #64748b; font-size: 15px; margin: 0; }
+        .order-badge-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .order-id-label { font-size: 14px; color: #475569; }
+        .order-id-val { font-family: monospace; font-weight: bold; font-size: 16px; color: #1e293b; }
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .badge-paid { background: #d1fae5; color: #065f46; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-placed { background: #dbeafe; color: #1e40af; }
+        .section-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: #1e293b;
+            margin: 20px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        @media (max-width: 600px) {
+            .details-grid { grid-template-columns: 1fr; }
+        }
+        .details-grid strong { color: #0f172a; }
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .items-table th {
+            background: #f1f5f9;
+            text-align: left;
+            padding: 12px;
+            font-size: 13px;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .items-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+        .book-cell { display: flex; align-items: center; gap: 12px; }
+        .book-cell img {
+            width: 45px; height: 60px; object-fit: cover;
+            border-radius: 4px; border: 1px solid #ddd;
+        }
+        .book-cell .no-img {
+            width: 45px; height: 60px; background: #e2e8f0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; color: #64748b; border-radius: 4px; text-align: center;
+        }
+        .totals-summary { text-align: right; padding: 15px 0; border-top: 2px solid #e2e8f0; }
+        .total-amount { font-size: 22px; font-weight: bold; color: #198754; }
+        .actions-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 22px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #0d6efd; color: white; }
+        .btn-primary:hover { background: #0b5ed7; }
+        .btn-secondary { background: #222; color: white; }
+        .btn-secondary:hover { background: #444; }
+        .btn-outline { background: white; color: #475569; border: 1px solid #cbd5e1; }
+        .btn-outline:hover { background: #f8fafc; color: #0f172a; }
+        @media print {
+            body { background: white; padding: 0; }
+            .actions-row, .top-nav { display: none !important; }
+            .success-card { box-shadow: none; border: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="success-card">
+        <div class="header">
+            <div class="checkmark-circle">✓</div>
+            <h1>Order Confirmed!</h1>
+            <p class="subtitle">Thank you for your order. We have received your request and will process it shortly.</p>
+        </div>
+
+        <div class="order-badge-row">
+            <div>
+                <span class="order-id-label">Order Reference ID:</span><br>
+                <span class="order-id-val">{{ order.order_id }}</span>
+            </div>
+            <div style="text-align: right;">
+                <span class="order-id-label">Order Status:</span><br>
+                <span class="badge badge-placed">📦 {{ order.get_order_status_display }}</span>
+                <br style="margin-bottom: 4px;">
+                <span class="order-id-label">Payment Status:</span><br>
+                {% if order.payment_status == 'PAID' %}
+                    <span class="badge badge-paid">✔ PAID (Online Payment)</span>
+                {% elif order.payment_status == 'PENDING' %}
+                    <span class="badge badge-pending">⏳ PENDING (Cash on Delivery)</span>
+                {% else %}
+                    <span class="badge" style="background: #fde8e8; color: #9b1c1c;">{{ order.get_payment_status_display }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="section-title">📍 Delivery & Payment Details</div>
+        <div class="details-grid">
+            <div>
+                <strong>Customer Name:</strong> {{ order.customer_name }}<br>
+                <strong>Mobile Number:</strong> {{ order.mobile }}<br>
+                {% if order.customer_email %}
+                    <strong>Email:</strong> {{ order.customer_email }}<br>
+                {% endif %}
+                <strong>Order Placed:</strong> {{ order.created_at|date:"M d, Y h:i A" }}
+            </div>
+            <div>
+                <strong>Shipping Address:</strong><br>
+                {{ order.address }}<br>
+                {{ order.city }}, {{ order.state }} - {{ order.pincode }}<br>
+                <div style="margin-top: 8px;">
+                    <strong>Payment Method:</strong>
+                    {% if order.payment_method == 'ONLINE' %}
+                        Razorpay Online (TEST MODE)
+                    {% else %}
+                        Cash on Delivery (COD)
+                    {% endif %}
+                </div>
+                {% if order.razorpay_payment_id %}
+                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+                        Razorpay Payment ID: <code>{{ order.razorpay_payment_id }}</code>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="section-title">📚 Ordered Books</div>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Book</th>
+                    <th>Price</th>
+                    <th style="text-align: center;">Qty</th>
+                    <th style="text-align: right;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>
+                            <div class="book-cell">
+                                {% if item.book and item.book.image %}
+                                    <img src="{{ item.book.image.url }}" alt="{{ item.book_title }}">
+                                {% elif item.book_image %}
+                                    <img src="/media/{{ item.book_image }}" alt="{{ item.book_title }}">
+                                {% else %}
+                                    <div class="no-img">No Image</div>
+                                {% endif %}
+                                <div>
+                                    <strong>{{ item.book_title }}</strong>
+                                    {% if item.book and item.book.author %}
+                                        <div style="font-size: 12px; color: #64748b;">by {{ item.book.author.name }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>₹{{ item.price }}</td>
+                        <td style="text-align: center;">{{ item.quantity }}</td>
+                        <td style="text-align: right; font-weight: bold;">₹{{ item.subtotal }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="totals-summary">
+            <div style="font-size: 14px; color: #64748b; margin-bottom: 5px;">
+                Shipping: <span style="color: #059669; font-weight: bold;">FREE</span>
+            </div>
+            <div>
+                <span style="font-size: 16px; font-weight: bold; margin-right: 15px;">Total Amount:</span>
+                <span class="total-amount">₹{{ order.total_amount }}</span>
+            </div>
+        </div>
+
+        <div class="actions-row">
+            <button class="btn btn-outline" onclick="window.print()">🖨️ Print Receipt</button>
+            <a href="{% url 'order_detail' order.order_id %}" class="btn btn-primary">📋 Order Details</a>
+            <a href="{% url 'order_history' %}" class="btn btn-primary">📦 View All Orders</a>
+            <a href="{% url 'book_list' %}" class="btn btn-secondary">← Browse More Books</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

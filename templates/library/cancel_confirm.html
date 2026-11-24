@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancel Order - Library Management System</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px 15px;
+            color: #333;
+        }
+        .container { max-width: 700px; margin: 0 auto; }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+        }
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .back-link {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        .back-link:hover { color: #0d6efd; }
+        h1 {
+            text-align: center;
+            color: #dc3545;
+            margin: 0 0 25px;
+            font-size: 24px;
+        }
+        .order-summary {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .order-summary strong { color: #0f172a; }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .badge-paid { background: #d1fae5; color: #065f46; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        .warning-box {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            color: #92400e;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .error-box {
+            background: #fde8e8;
+            border: 1px solid #f8b4b4;
+            color: #9b1c1c;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #444;
+        }
+        textarea {
+            width: 100%;
+            padding: 11px 13px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220,53,69,0.15);
+        }
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover { background: #bb2d3b; }
+        .btn-danger:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover { background: #5c636a; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-nav">
+        <a class="back-link" href="{% url 'order_history' %}">← Back to Orders</a>
+        <div style="font-size: 13px; color: #64748b;">🎓 College Demo</div>
+    </div>
+
+    {% if not_eligible %}
+        <div class="card">
+            <h1>❌ Cancellation Not Available</h1>
+            <div class="error-box">
+                <strong>Notice:</strong> {{ message }}
+            </div>
+
+            <div class="order-summary">
+                <strong>Order ID:</strong> {{ order.order_id }}<br>
+                <strong>Status:</strong> <span class="badge badge-info">{{ order.get_order_status_display }}</span><br>
+                <strong>Payment:</strong> {{ order.get_payment_method_display }} —
+                {% if order.payment_status == 'PAID' %}
+                    <span class="badge badge-paid">Paid</span>
+                {% elif order.payment_status == 'PENDING' %}
+                    <span class="badge badge-pending">Pending</span>
+                {% else %}
+                    {{ order.get_payment_status_display }}
+                {% endif %}
+            </div>
+
+            <div class="actions">
+                <a href="{% url 'order_detail' order.order_id %}" class="btn btn-secondary">View Order Details</a>
+                <a href="{% url 'order_history' %}" class="btn btn-secondary">Back to Orders</a>
+            </div>
+        </div>
+    {% else %}
+        <div class="card">
+            <h1>⚠️ Cancel Order</h1>
+
+            <div class="warning-box">
+                <strong>Are you sure you want to cancel this order?</strong><br>
+                {% if order.payment_method == 'ONLINE' and order.payment_status == 'PAID' %}
+                    This order was paid online via Razorpay. A refund will be initiated upon cancellation.
+                    The refund may take 5-7 business days to reflect in your account (simulated in test mode).
+                {% else %}
+                    This is a Cash on Delivery order. No payment has been collected yet.
+                {% endif %}
+            </div>
+
+            <div class="order-summary">
+                <strong>Order ID:</strong> {{ order.order_id }}<br>
+                <strong>Customer:</strong> {{ order.customer_name }} ({{ order.mobile }})<br>
+                <strong>Total Amount:</strong> ₹{{ order.total_amount }}<br>
+                <strong>Payment Method:</strong> {{ order.get_payment_method_display }}<br>
+                <strong>Payment Status:</strong>
+                {% if order.payment_status == 'PAID' %}
+                    <span class="badge badge-paid">✔ Paid</span>
+                {% else %}
+                    <span class="badge badge-pending">⏳ Pending</span>
+                {% endif %}<br>
+                <strong>Order Status:</strong> <span class="badge badge-info">{{ order.get_order_status_display }}</span><br>
+                <strong>Delivery:</strong> {{ order.address }}, {{ order.city }}, {{ order.state }} - {{ order.pincode }}<br>
+                <strong>Ordered:</strong> {{ order.created_at|date:"M d, Y h:i A" }}
+            </div>
+
+            <form method="POST" action="{% url 'cancel_order' order.order_id %}" id="cancel-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="cancellation_reason">Reason for Cancellation (Optional):</label>
+                    <textarea
+                        id="cancellation_reason"
+                        name="cancellation_reason"
+                        rows="3"
+                        placeholder="e.g. Changed my mind, found a better price, ordered by mistake..."
+                    ></textarea>
+                </div>
+
+                <div class="actions">
+                    <a href="{% url 'order_detail' order.order_id %}" class="btn btn-secondary">← Keep Order</a>
+                    <button type="submit" class="btn btn-danger" id="cancel-btn"
+                            onclick="this.disabled=true; this.textContent='Cancelling...'; this.form.submit();">
+                        ❌ Confirm Cancellation
+                    </button>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

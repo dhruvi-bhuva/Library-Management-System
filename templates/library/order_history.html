@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Library Management System</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px 15px;
+            color: #333;
+        }
+        .container { max-width: 950px; margin: 0 auto; }
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        .nav-links a:hover { color: #0d6efd; }
+        h1 { color: #1e293b; margin: 0 0 25px; font-size: 26px; }
+        .order-card {
+            background: white;
+            border-radius: 10px;
+            padding: 22px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+            transition: box-shadow 0.2s;
+        }
+        .order-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 14px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .order-ref { font-family: monospace; font-weight: bold; font-size: 15px; color: #0f172a; }
+        .order-date { font-size: 13px; color: #64748b; margin-top: 2px; }
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+        .badge-paid { background: #d1fae5; color: #065f46; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-failed { background: #fee2e2; color: #991b1b; }
+        .badge-placed { background: #dbeafe; color: #1e40af; }
+        .badge-processing { background: #fef3c7; color: #92400e; }
+        .badge-shipped { background: #e0e7ff; color: #3730a3; }
+        .badge-delivered { background: #d1fae5; color: #065f46; }
+        .badge-cancelled { background: #fee2e2; color: #991b1b; }
+        .badge-refund-pending { background: #fed7aa; color: #9a3412; }
+        .badge-refunded { background: #e2e8f0; color: #475569; }
+        .order-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .items-list { flex: 1; min-width: 250px; }
+        .item-row { font-size: 14px; color: #334155; margin-bottom: 4px; }
+        .item-qty { color: #64748b; font-size: 13px; }
+        .order-meta { text-align: right; }
+        .order-price { font-size: 20px; font-weight: bold; color: #198754; margin-bottom: 8px; }
+        .btn-view {
+            display: inline-block;
+            background: #0d6efd;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: bold;
+            transition: background 0.2s;
+            margin-bottom: 5px;
+        }
+        .btn-view:hover { background: #0b5ed7; }
+        .btn-cancel {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn-cancel:hover { background: #bb2d3b; }
+        .cancel-info {
+            margin-top: 10px;
+            padding: 10px 14px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #991b1b;
+            line-height: 1.5;
+        }
+        .refund-info {
+            margin-top: 6px;
+            padding: 8px 12px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #1e40af;
+        }
+        .empty-state {
+            background: white;
+            padding: 50px 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        .empty-state h2 { margin: 0 0 10px; color: #475569; }
+        .btn-shop {
+            display: inline-block;
+            margin-top: 15px;
+            background: #198754;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .btn-shop:hover { background: #146c43; }
+        .status-badges { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-nav">
+        <div class="nav-links">
+            <a href="{% url 'book_list' %}">← Books Library</a>
+            <a href="{% url 'cart' %}">🛒 Cart</a>
+        </div>
+        <div style="font-size: 13px; color: #64748b;">
+            🎓 College Demo • Orders Record
+        </div>
+    </div>
+
+    <h1>📦 Order History</h1>
+
+    {% if orders %}
+        {% for order in orders %}
+            <div class="order-card">
+                <div class="order-header">
+                    <div>
+                        <div class="order-ref">Order #{{ order.order_id|stringformat:"s"|slice:":8" }}... ({{ order.customer_name }})</div>
+                        <div class="order-date">
+                            Placed on {{ order.created_at|date:"M d, Y h:i A" }} • Deliver to: {{ order.city }}, {{ order.state }}
+                        </div>
+                    </div>
+                    <div class="status-badges">
+                        <!-- Order Status Badge -->
+                        {% if order.order_status == 'PLACED' %}
+                            <span class="badge badge-placed">📦 Placed</span>
+                        {% elif order.order_status == 'PROCESSING' %}
+                            <span class="badge badge-processing">⚙️ Processing</span>
+                        {% elif order.order_status == 'SHIPPED' %}
+                            <span class="badge badge-shipped">🚚 Shipped</span>
+                        {% elif order.order_status == 'DELIVERED' %}
+                            <span class="badge badge-delivered">✅ Delivered</span>
+                        {% elif order.order_status == 'CANCELLED' %}
+                            <span class="badge badge-cancelled">❌ Cancelled</span>
+                        {% elif order.order_status == 'CANCELLATION_REQUESTED' %}
+                            <span class="badge badge-refund-pending">⏳ Cancel Requested</span>
+                        {% endif %}
+
+                        <!-- Payment Status Badge -->
+                        {% if order.payment_status == 'PAID' %}
+                            <span class="badge badge-paid">✔ PAID ({{ order.get_payment_method_display }})</span>
+                        {% elif order.payment_status == 'PENDING' %}
+                            <span class="badge badge-pending">⏳ PENDING ({{ order.get_payment_method_display }})</span>
+                        {% elif order.payment_status == 'REFUND_PENDING' %}
+                            <span class="badge badge-refund-pending">↩ Refund Pending</span>
+                        {% elif order.payment_status == 'REFUNDED' %}
+                            <span class="badge badge-refunded">↩ Refunded</span>
+                        {% else %}
+                            <span class="badge badge-failed">{{ order.get_payment_status_display }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="order-body">
+                    <div class="items-list">
+                        {% for item in order.items.all %}
+                            <div class="item-row">
+                                • <strong>{{ item.book_title }}</strong> <span class="item-qty">× {{ item.quantity }}</span> (₹{{ item.subtotal }})
+                            </div>
+                        {% endfor %}
+
+                        {% if order.order_status == 'CANCELLED' %}
+                            <div class="cancel-info">
+                                <strong>❌ Cancelled</strong>
+                                {% if order.cancelled_at %}
+                                    on {{ order.cancelled_at|date:"M d, Y h:i A" }}
+                                {% endif %}
+                                {% if order.cancellation_reason %}
+                                    <br>Reason: {{ order.cancellation_reason }}
+                                {% endif %}
+                            </div>
+                            {% if order.refund_status != 'NOT_APPLICABLE' %}
+                                <div class="refund-info">
+                                    💰 Refund: {{ order.get_refund_status_display }}
+                                    {% if order.refund_id %} (Ref: {{ order.refund_id }}){% endif %}
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                    <div class="order-meta">
+                        <div class="order-price">₹{{ order.total_amount }}</div>
+                        <a href="{% url 'order_detail' order.order_id %}" class="btn-view">
+                            View Details →
+                        </a>
+                        {% if order.is_cancellable %}
+                            <br>
+                            <a href="{% url 'cancel_confirm' order.order_id %}" class="btn-cancel">
+                                ❌ Cancel
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <h2>No orders placed yet</h2>
+            <p style="color: #64748b;">Browse our library collection and place your first book order!</p>
+            <a href="{% url 'book_list' %}" class="btn-shop">Browse Books</a>
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

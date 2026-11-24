@@ -1,0 +1,30 @@
+# Environment variables and secrets
+.env
+*.env
+.env.local
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# SQLite database
+db.sqlite3
+*.sqlite3
+
+# Media uploads
+media/
+
+# IDE & Editor artifacts
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Antigravity / Gemini artifacts
+.gemini/
