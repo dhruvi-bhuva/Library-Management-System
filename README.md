@@ -94,9 +94,6 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-Open your browser:
-
-http://127.0.0.1:8000/
 
 ## 💳 Payment Integration
 
@@ -116,4 +113,3 @@ GitHub: https://github.com/dhruvi-bhuva
 
 ---
 
-⭐ If you find this project useful, consider giving it a star!
