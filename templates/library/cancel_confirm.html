@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancel Order - Library Management System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
+            margin: 0;
+            padding: 30px 15px;
+            color: #1e293b;
+        }
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+        }
+        .top-nav {
+            margin-bottom: 25px;
+        }
+        .back-link {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            color: #0d6efd;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+        }
+        h1 {
+            font-size: 24px;
+            color: #0f172a;
+            margin: 0 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .subtitle {
+            color: #64748b;
+            font-size: 14px;
+            margin: 0 0 20px;
+        }
+        .alert-warning {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            color: #92400e;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        .alert-danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        .order-summary-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .summary-row:last-child {
+            margin-bottom: 0;
+        }
+        .summary-label {
+            color: #64748b;
+        }
+        .summary-val {
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .refund-notice {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        .refund-notice.cod {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            margin-bottom: 20px;
+            resize: vertical;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .btn-cancel-confirm {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            flex: 1;
+        }
+        .btn-cancel-confirm:hover {
+            background: #b91c1c;
+        }
+        .btn-back {
+            display: inline-block;
+            background: #e2e8f0;
+            color: #334155;
+            text-decoration: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .btn-back:hover {
+            background: #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-nav">
+        <a href="{% url 'order_history' %}" class="back-link">← Return to Order History</a>
+    </div>
+
+    <div class="card">
+        {% if not_eligible %}
+            <h1>🚫 Order Cannot Be Cancelled</h1>
+            <div class="alert-danger">
+                {{ message }}
+            </div>
+            <p style="color: #64748b; font-size: 14px;">
+                Only orders with status <strong>Placed</strong> or <strong>Processing</strong> are eligible for cancellation before dispatch.
+            </p>
+            <div style="margin-top: 25px;">
+                <a href="{% url 'order_history' %}" class="btn-back">← Back to My Orders</a>
+            </div>
+        {% else %}
+            <h1>⚠️ Cancel Order Confirmation</h1>
+            <p class="subtitle">Are you sure you want to cancel this order? This action cannot be undone.</p>
+
+            <div class="order-summary-box">
+                <div class="summary-row">
+                    <span class="summary-label">Order Reference:</span>
+                    <span class="summary-val">#{{ order.order_id|stringformat:"s"|slice:":8" }}...</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Current Status:</span>
+                    <span class="summary-val">{{ order.get_order_status_display }}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Payment Method:</span>
+                    <span class="summary-val">{{ order.get_payment_method_display }}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Payment Status:</span>
+                    <span class="summary-val">{{ order.get_payment_status_display }}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Total Payable:</span>
+                    <span class="summary-val" style="color: #166534; font-size: 16px;">₹{{ order.total_amount }}</span>
+                </div>
+            </div>
+
+            {% if order.payment_method == 'ONLINE' and order.payment_status == 'PAID' %}
+                <div class="refund-notice">
+                    💰 <strong>Online Payment Refund Policy:</strong><br>
+                    Since you paid <strong>₹{{ order.total_amount }}</strong> via Online Payment (Razorpay), upon cancellation your order status will be marked as <strong>Cancelled</strong> and a refund request of <strong>₹{{ order.total_amount }}</strong> will be recorded as <strong>Refund Pending</strong>. The amount will be refunded to your original payment method.
+                </div>
+            {% else %}
+                <div class="refund-notice cod">
+                    💵 <strong>Cash on Delivery (COD) Cancellation:</strong><br>
+                    Since no payment was collected upfront for Cash on Delivery, your order status will be directly marked as <strong>Cancelled</strong> and no refund is required.
+                </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'cancel_order' order.order_id %}">
+                {% csrf_token %}
+                <label for="cancellation_reason">Reason for Cancellation (Optional)</label>
+                <textarea
+                    id="cancellation_reason"
+                    name="cancellation_reason"
+                    rows="3"
+                    placeholder="e.g. Ordered by mistake, bought from bookstore directly, delivery address change, etc."
+                ></textarea>
+
+                <div class="actions">
+                    <button type="submit" class="btn-cancel-confirm">
+                        ✔ Yes, Cancel This Order
+                    </button>
+                    <a href="{% url 'order_history' %}" class="btn-back">
+                        No, Keep Order
+                    </a>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

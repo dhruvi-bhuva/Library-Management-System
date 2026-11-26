@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Razorpay Payment - Library Management System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            margin: 0;
+            padding: 30px 15px;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 520px;
+        }
+        .modal-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        .modal-header {
+            background: #0b69ff;
+            color: white;
+            padding: 22px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand-title {
+            font-size: 19px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.3px;
+        }
+        .badge-mode {
+            background: rgba(255,255,255,0.22);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .order-strip {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .order-label {
+            font-size: 13px;
+            color: #64748b;
+        }
+        .order-val {
+            font-weight: bold;
+            color: #0f172a;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .amount-highlight {
+            font-size: 26px;
+            font-weight: 800;
+            color: #0b69ff;
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 4px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab-btn.active {
+            color: #0b69ff;
+            border-bottom-color: #0b69ff;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .demo-input {
+            width: 100%;
+            padding: 11px 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: monospace;
+            background: #f8fafc;
+            color: #0f172a;
+            font-weight: 600;
+        }
+        .demo-row {
+            display: flex;
+            gap: 12px;
+        }
+        .demo-row .form-group {
+            flex: 1;
+        }
+        .notice-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 12px;
+            color: #1e40af;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        .btn-success-pay {
+            width: 100%;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        .btn-success-pay:hover {
+            background: #059669;
+        }
+        .btn-fail-pay {
+            width: 100%;
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            padding: 11px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+        .btn-fail-pay:hover {
+            background: #fecaca;
+        }
+        .cancel-btn {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .cancel-btn:hover {
+            color: #dc2626;
+        }
+        .footer-secure {
+            padding: 14px 24px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #64748b;
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="modal-card">
+        <!-- Header -->
+        <div class="modal-header">
+            <div class="brand-title">
+                ⚡ Razorpay Demo Gateway
+            </div>
+            <span class="badge-mode">{% if is_demo %}Demo Sandbox{% else %}Test Mode{% endif %}</span>
+        </div>
+
+        <!-- Order Strip -->
+        <div class="order-strip">
+            <div>
+                <div class="order-label">Order Ref:</div>
+                <div class="order-val">{{ razorpay_order_id|slice:":18" }}...</div>
+            </div>
+            <div style="text-align: right;">
+                <div class="order-label">Total Payable:</div>
+                <div class="amount-highlight">₹{{ total_amount }}</div>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            {% if is_demo %}
+                <!-- DEMO MODE INTERFACE -->
+                <div class="tabs">
+                    <button type="button" class="tab-btn active">💳 Card (Test)</button>
+                    <button type="button" class="tab-btn">📱 UPI (Test)</button>
+                    <button type="button" class="tab-btn">🏦 Netbanking</button>
+                </div>
+
+                <div class="notice-box">
+                    🎓 <strong>Razorpay Demo Simulation:</strong> This environment simulates Razorpay checkout. Test payments verify signatures cryptographically on the server without charging any real money.
+                </div>
+
+                <div class="form-group">
+                    <label>Card Number (Demo Test Card)</label>
+                    <input type="text" class="demo-input" value="4111 1111 1111 1111" readonly>
+                </div>
+
+                <div class="demo-row">
+                    <div class="form-group">
+                        <label>Expiry Date</label>
+                        <input type="text" class="demo-input" value="12/28" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>CVV</label>
+                        <input type="text" class="demo-input" value="123" readonly>
+                    </div>
+                </div>
+
+                <!-- Simulation Action Buttons -->
+                <button type="button" class="btn-success-pay" id="demo-success-btn" onclick="submitDemoPayment()">
+                    ✔ Pay ₹{{ total_amount }} (Simulate Successful Payment)
+                </button>
+
+                <button type="button" class="btn-fail-pay" onclick="simulatePaymentFailure()">
+                    ✖ Simulate Failed Payment (Bank Declined)
+                </button>
+
+                <a href="{{ failed_url }}?reason=cancelled" class="cancel-btn">
+                    ← Cancel Payment & Return to Cart
+                </a>
+
+            {% else %}
+                <!-- OFFICIAL RAZORPAY SDK MODE -->
+                <div style="text-align: center; padding: 20px 0;">
+                    <p style="color: #475569; font-size: 14px; margin-bottom: 20px;">
+                        Opening Razorpay Test Checkout modal...
+                    </p>
+                    <button type="button" class="btn-success-pay" id="rzp-button">
+                        🚀 Open Razorpay Checkout Modal
+                    </button>
+                    <a href="{{ failed_url }}?reason=cancelled" class="cancel-btn">
+                        ← Cancel Payment & Return to Cart
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-secure">
+            <span>🔒 256-bit SSL Encrypted</span>
+            <span>Razorpay Payments • College Demo</span>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden verification form submitted on Razorpay success -->
+<form id="razorpay-verification-form" method="POST" action="{{ verify_url }}" style="display: none;">
+    {% csrf_token %}
+    <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id" value="{{ demo_payment_id }}">
+    <input type="hidden" name="razorpay_order_id" id="razorpay_order_id" value="{{ razorpay_order_id }}">
+    <input type="hidden" name="razorpay_signature" id="razorpay_signature" value="{{ demo_signature }}">
+</form>
+
+<script>
+    function submitDemoPayment() {
+        const btn = document.getElementById('demo-success-btn');
+        if (btn) {
+            btn.innerHTML = '<span class="spinner"></span> Verifying Payment Signature...';
+            btn.disabled = true;
+        }
+        document.getElementById('razorpay-verification-form').submit();
+    }
+
+    function simulatePaymentFailure() {
+        const desc = encodeURIComponent('Transaction declined by issuing bank (Demo simulation error).');
+        window.location.href = "{{ failed_url }}?reason=failed&description=" + desc;
+    }
+</script>
+
+{% if not is_demo %}
+<!-- Razorpay Official Checkout Script for Live/Test Keys -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    const options = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ amount_in_paise }}",
+        "currency": "INR",
+        "name": "Library Management System",
+        "description": "Order Payment (Test Mode)",
+        "order_id": "{{ razorpay_order_id }}",
+        "handler": function (response) {
+            document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+            document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+            document.getElementById('razorpay_signature').value = response.razorpay_signature;
+
+            const btn = document.getElementById('rzp-button');
+            if (btn) {
+                btn.innerHTML = '<span class="spinner"></span> Verifying on server...';
+                btn.disabled = true;
+            }
+
+            document.getElementById('razorpay-verification-form').submit();
+        },
+        "prefill": {
+            "name": "{{ delivery.customer_name|escapejs }}",
+            "email": "{{ delivery.customer_email|escapejs }}",
+            "contact": "{{ delivery.mobile|escapejs }}"
+        },
+        "theme": {
+            "color": "#0b69ff"
+        },
+        "modal": {
+            "ondismiss": function() {
+                window.location.href = "{{ failed_url }}?reason=cancelled";
+            }
+        }
+    };
+
+    const rzp = new Razorpay(options);
+
+    rzp.on('payment.failed', function (response) {
+        const desc = encodeURIComponent(response.error.description || 'Payment Failed');
+        const code = encodeURIComponent(response.error.code || '');
+        window.location.href = "{{ failed_url }}?reason=failed&description=" + desc + "&code=" + code;
+    });
+
+    document.getElementById('rzp-button').onclick = function(e){
+        rzp.open();
+        e.preventDefault();
+    };
+
+    window.onload = function() {
+        rzp.open();
+    };
+</script>
+{% endif %}
+
+</body>
+</html>

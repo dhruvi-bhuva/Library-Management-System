@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist - Saved Books</title>
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --primary-hover: #0b5ed7;
+            --success: #198754;
+            --success-hover: #157347;
+            --danger: #dc3545;
+            --danger-hover: #bb2d3b;
+            --warning: #f59e0b;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f1f5f9;
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #1e293b;
+            color: white;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .nav-badge-wishlist {
+            background: #e11d48;
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .nav-badge-cart {
+            background: #10b981;
+            color: white !important;
+            font-weight: 600;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1060px;
+            margin: 25px auto;
+            padding: 0 16px;
+        }
+
+        .breadcrumb {
+            margin-bottom: 18px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Header Area */
+        .page-header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px 28px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            color: #166534;
+        }
+
+        .alert-error, .alert-danger {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+        }
+
+        .alert-info {
+            background: #e0f2fe;
+            border: 1px solid #7dd3fc;
+            color: #075985;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+
+        /* Wishlist Items List */
+        .wishlist-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .wishlist-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 24px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+            display: grid;
+            grid-template-columns: 100px 1fr auto;
+            gap: 24px;
+            align-items: center;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .wishlist-card:hover {
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        @media (max-width: 768px) {
+            .wishlist-card {
+                grid-template-columns: 80px 1fr;
+                gap: 16px;
+            }
+            .item-actions {
+                grid-column: 1 / -1;
+                justify-content: flex-start;
+                border-top: 1px solid var(--border-color);
+                padding-top: 14px;
+            }
+        }
+
+        .item-thumb {
+            width: 90px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .no-thumb {
+            width: 90px;
+            height: 120px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 24px;
+        }
+
+        .item-details h2 {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .item-details h2 a {
+            color: var(--text-dark);
+            text-decoration: none;
+        }
+
+        .item-details h2 a:hover {
+            color: var(--primary);
+        }
+
+        .author-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .rating-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--warning);
+            margin-bottom: 8px;
+        }
+
+        .item-price {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--success);
+            margin-bottom: 6px;
+        }
+
+        .stock-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .in-stock {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .out-of-stock {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .added-date {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Item Action Buttons */
+        .item-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 170px;
+        }
+
+        @media (max-width: 768px) {
+            .item-actions {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-move {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-move:hover {
+            background: #059669;
+        }
+
+        .btn-add {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-add:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-remove {
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid #fecaca;
+        }
+
+        .btn-remove:hover {
+            background: #fee2e2;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: #334155;
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+
+        /* Empty State */
+        .empty-wishlist-card {
+            background: white;
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .empty-icon {
+            font-size: 60px;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+
+        .empty-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <header class="navbar">
+        <a href="{% url 'book_list' %}" class="navbar-brand">📚 E-Commerce Books</a>
+        <nav class="navbar-nav">
+            <a href="{% url 'book_list' %}" class="nav-link">🏠 Browse Books</a>
+            <a href="{% url 'wishlist' %}" class="nav-link nav-badge-wishlist">❤️ Wishlist ({{ wishlist_count }})</a>
+            <a href="{% url 'order_history' %}" class="nav-link">📦 My Orders</a>
+            <a href="{% url 'cart' %}" class="nav-link nav-badge-cart">🛒 Cart</a>
+
+            {% if user.is_authenticated %}
+                <span class="nav-link" style="color: #94a3b8;">
+                    👤 {{ user.username }}{% if user.is_staff %} (Admin){% endif %}
+                </span>
+                <a href="{% url 'logout' %}" class="nav-link" style="color: #fca5a5;">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="nav-link">🔑 Login</a>
+                <a href="{% url 'register' %}" class="nav-link">✍️ Register</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <div class="container">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="{% url 'book_list' %}">Home</a> &gt; <span>My Wishlist</span>
+        </div>
+
+        <!-- Flash Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">
+                    <span>❤️ My Wishlist</span>
+                </h1>
+                <p style="font-size: 14px; color: var(--text-muted); margin-top: 4px;">
+                    Saved books you want to read or buy later ({{ total_items }} item{{ total_items|pluralize }})
+                </p>
+            </div>
+
+            {% if total_items > 0 %}
+            <div class="header-actions">
+                <a href="{% url 'move_all_to_cart' %}" class="btn btn-move">
+                    ⚡ Move All to Cart
+                </a>
+                <a href="{% url 'book_list' %}" class="btn btn-outline">
+                    + Explore More Books
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Wishlist Items -->
+        {% if total_items > 0 %}
+            <div class="wishlist-grid">
+                {% for item in wishlist_items %}
+                    <div class="wishlist-card" id="wishlist-item-{{ item.id }}">
+                        <!-- Thumbnail -->
+                        <div>
+                            {% if item.book.image %}
+                                <a href="{% url 'book_detail' item.book.id %}">
+                                    <img src="{{ item.book.image.url }}" alt="{{ item.book.title }}" class="item-thumb">
+                                </a>
+                            {% else %}
+                                <div class="no-thumb">📖</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Book Info -->
+                        <div class="item-details">
+                            <h2>
+                                <a href="{% url 'book_detail' item.book.id %}">{{ item.book.title }}</a>
+                            </h2>
+                            <div class="author-text">
+                                By {{ item.book.author.name }} &bull; ISBN: {{ item.book.isbn_number }}
+                            </div>
+
+                            <div class="rating-badge">
+                                {% if item.book.total_reviews > 0 %}
+                                    ★ {{ item.book.average_rating }} ({{ item.book.total_reviews }} review{{ item.book.total_reviews|pluralize }})
+                                {% else %}
+                                    ☆ No ratings yet
+                                {% endif %}
+                            </div>
+
+                            <div class="item-price">
+                                ₹{{ item.book.price }}
+                            </div>
+
+                            <div>
+                                {% if item.book.available %}
+                                    <span class="stock-badge in-stock">✓ In Stock</span>
+                                {% else %}
+                                    <span class="stock-badge out-of-stock">✗ Out of Stock</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="added-date">
+                                Saved on {{ item.added_at|date:"M d, Y" }}
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="item-actions">
+                            {% if item.book.available %}
+                                <!-- 1. Move to Cart (Adds to Cart and Removes from Wishlist) -->
+                                <a href="{% url 'move_to_cart' item.book.id %}" class="btn btn-move" title="Add to Cart and remove from Wishlist">
+                                    🛒 Move to Cart
+                                </a>
+
+                                <!-- 2. Add to Cart (Keeps in Wishlist) -->
+                                <a href="{% url 'add_to_cart' item.book.id %}" class="btn btn-add" title="Add to Cart and keep in Wishlist">
+                                    ➕ Add to Cart
+                                </a>
+                            {% else %}
+                                <button class="btn btn-outline" disabled style="color: #94a3b8;">
+                                    Out of Stock
+                                </button>
+                            {% endif %}
+
+                            <!-- 3. Remove from Wishlist -->
+                            <a href="{% url 'remove_from_wishlist' item.book.id %}" class="btn btn-remove"
+                               onclick="return confirm('Remove \'{{ item.book.title|escapejs }}\' from your wishlist?');">
+                                🗑️ Remove
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <!-- Empty State -->
+            <div class="empty-wishlist-card">
+                <div class="empty-icon">🤍</div>
+                <h2 class="empty-title">Your Wishlist is Empty</h2>
+                <p class="empty-desc">
+                    Explore our collection of books and save your favorites here to purchase whenever you're ready!
+                </p>
+                <a href="{% url 'book_list' %}" class="btn btn-add" style="padding: 12px 24px; font-size: 15px;">
+                    📚 Browse Books Now
+                </a>
+            </div>
+        {% endif %}
+
+    </div>
+
+</body>
+</html>

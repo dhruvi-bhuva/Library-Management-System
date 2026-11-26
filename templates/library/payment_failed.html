@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Incomplete - Library Management System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 35px 15px;
+            color: #333;
+        }
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+        .failure-card {
+            background: white;
+            border-radius: 12px;
+            padding: 35px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            border: 1px solid #fee2e2;
+            text-align: center;
+        }
+        .icon-circle {
+            width: 70px;
+            height: 70px;
+            background: #fee2e2;
+            color: #dc2626;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            margin: 0 auto 15px;
+        }
+        h1 {
+            color: #1e293b;
+            margin: 0 0 10px;
+            font-size: 24px;
+        }
+        .reason-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: left;
+        }
+        .cart-status-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: left;
+        }
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-retry {
+            background: #0d6efd;
+            color: white;
+        }
+        .btn-retry:hover {
+            background: #0b5ed7;
+        }
+        .btn-cart {
+            background: #222;
+            color: white;
+        }
+        .btn-cart:hover {
+            background: #444;
+        }
+        .btn-browse {
+            background: white;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+        .btn-browse:hover {
+            background: #f8fafc;
+        }
+        .demo-note {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="failure-card">
+        <div class="icon-circle">✕</div>
+        <h1>Payment Incomplete or Cancelled</h1>
+        <p style="color: #64748b; margin: 0;">No funds were deducted from your account.</p>
+
+        <div class="reason-box">
+            <strong>What happened:</strong><br>
+            {{ reason }}
+            {% if error_code %}
+                <div style="font-size: 12px; margin-top: 4px; color: #7f1d1d;">Error Code: <code>{{ error_code }}</code></div>
+            {% endif %}
+        </div>
+
+        <div class="cart-status-box">
+            🛒 <strong>Your Cart is Intact!</strong><br>
+            Your selected books ({{ cart.total_quantity }} item{{ cart.total_quantity|pluralize }}, Total: ₹{{ cart.total_amount }}) are safely saved in your shopping cart. You can retry payment online with Razorpay Test Mode or switch to Cash on Delivery.
+        </div>
+
+        <div class="actions">
+            <a href="{% url 'checkout' %}" class="btn btn-retry">
+                🔄 Retry Payment / Change Option
+            </a>
+            <a href="{% url 'cart' %}" class="btn btn-cart">
+                🛒 View Cart
+            </a>
+            <a href="{% url 'book_list' %}" class="btn btn-browse">
+                ← Browse Books
+            </a>
+        </div>
+
+        <div class="demo-note">
+            🎓 <strong>College Demo Note:</strong> In Razorpay Test Mode, you can test both successful payments and cancelled/failed payments using Razorpay's test modal.
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

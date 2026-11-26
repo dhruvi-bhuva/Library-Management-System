@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.title }} - Product Details & Reviews</title>
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --primary-hover: #0b5ed7;
+            --success: #198754;
+            --success-hover: #157347;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --star-gold: #f59e0b;
+            --star-gray: #d1d5db;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --bg-light: #f8fafc;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f1f5f9;
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        /* Top Navigation Header */
+        .navbar {
+            background: #1e293b;
+            color: white;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .nav-btn-cart {
+            background: #10b981;
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .nav-btn-cart:hover {
+            background: #059669 !important;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1060px;
+            margin: 25px auto;
+            padding: 0 16px;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Messages */
+        .alert {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            color: #166534;
+        }
+
+        .alert-error, .alert-danger {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+        }
+
+        .alert-info {
+            background: #e0f2fe;
+            border: 1px solid #7dd3fc;
+            color: #075985;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+
+        /* Product Card */
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 36px;
+            margin-bottom: 35px;
+        }
+
+        @media (max-width: 768px) {
+            .product-card {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+        }
+
+        .product-media {
+            text-align: center;
+        }
+
+        .product-image {
+            width: 100%;
+            max-width: 280px;
+            height: 380px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .no-image-box {
+            width: 100%;
+            max-width: 280px;
+            height: 380px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 18px;
+            margin: 0 auto;
+        }
+
+        .product-info h1 {
+            font-size: 28px;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .author-line {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .rating-header-strip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .stars-display {
+            color: var(--star-gold);
+            font-size: 20px;
+            letter-spacing: 2px;
+        }
+
+        .rating-number {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 16px;
+        }
+
+        .reviews-count-badge {
+            color: var(--primary);
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .reviews-count-badge:hover {
+            text-decoration: underline;
+        }
+
+        .product-meta-table {
+            margin: 16px 0;
+            font-size: 14px;
+            color: #334155;
+        }
+
+        .product-meta-table tr td {
+            padding: 6px 12px 6px 0;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #64748b;
+            width: 130px;
+        }
+
+        .badge-available {
+            display: inline-block;
+            background: #d1fae5;
+            color: #065f46;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .badge-unavailable {
+            display: inline-block;
+            background: #fee2e2;
+            color: #991b1b;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .price-tag {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--success);
+            margin: 18px 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 14px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: var(--success-hover);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #bb2d3b;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        /* Reviews Section */
+        .reviews-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Rating Breakdown Grid */
+        .rating-overview-grid {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 30px;
+            background: var(--bg-light);
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 30px;
+            align-items: center;
+        }
+
+        @media (max-width: 640px) {
+            .rating-overview-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .overall-score-card {
+            text-align: center;
+            border-right: 1px solid var(--border-color);
+            padding-right: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .overall-score-card {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding-right: 0;
+                padding-bottom: 20px;
+            }
+        }
+
+        .score-large {
+            font-size: 48px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1;
+        }
+
+        .score-stars {
+            color: var(--star-gold);
+            font-size: 22px;
+            margin: 8px 0;
+        }
+
+        .score-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .breakdown-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .breakdown-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .breakdown-label {
+            width: 60px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .progress-bar-container {
+            flex: 1;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--star-gold);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        .breakdown-count {
+            width: 45px;
+            text-align: right;
+            color: var(--text-muted);
+        }
+
+        /* Review Submission Box */
+        .review-box-card {
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 30px;
+            background: #fafafa;
+        }
+
+        .review-box-card.verified {
+            border: 1px solid #bbf7d0;
+            background: #f0fdf4;
+        }
+
+        .review-box-header {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .interactive-stars {
+            display: flex;
+            gap: 6px;
+            font-size: 28px;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        .interactive-star {
+            color: var(--star-gray);
+            transition: color 0.15s ease-in-out, transform 0.1s;
+        }
+
+        .interactive-star:hover,
+        .interactive-star.active {
+            color: var(--star-gold);
+        }
+
+        .rating-select {
+            display: none; /* hidden when interactive JS stars exist, accessible fallback */
+        }
+
+        textarea.form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        textarea.form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+        }
+
+        /* User's existing review highlight */
+        .my-review-card {
+            border: 2px solid #93c5fd;
+            background: #eff6ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .my-review-badge {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        /* Review Item Card */
+        .review-card {
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 0;
+        }
+
+        .review-card:last-child {
+            border-bottom: none;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #e2e8f0;
+            color: #334155;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .reviewer-name {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 15px;
+        }
+
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #dcfce7;
+            color: #15803d;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 6px;
+        }
+
+        .review-date {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .review-stars {
+            color: var(--star-gold);
+            font-size: 16px;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .review-content {
+            font-size: 14px;
+            color: #334155;
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+
+        .review-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .empty-reviews {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Header -->
+    <header class="navbar">
+        <a href="{% url 'book_list' %}" class="navbar-brand">
+            📚 E-Commerce Books
+        </a>
+        <nav class="navbar-nav">
+            <a href="{% url 'book_list' %}" class="nav-link">🏠 Browse Books</a>
+            <a href="{% url 'wishlist' %}" class="nav-link" style="background: #e11d48; color: white; font-weight: 600;">❤️ Wishlist ({{ wishlist_count }})</a>
+            <a href="{% url 'order_history' %}" class="nav-link">📦 My Orders</a>
+            <a href="{% url 'cart' %}" class="nav-link nav-btn-cart">🛒 Cart</a>
+
+            {% if user.is_authenticated %}
+                <span class="nav-link" style="color: #94a3b8;">
+                    👤 {{ user.username }}{% if user.is_staff %} (Admin){% endif %}
+                </span>
+                <a href="{% url 'logout' %}" class="nav-link" style="color: #fca5a5;">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="nav-link">🔑 Login</a>
+                <a href="{% url 'register' %}" class="nav-link">✍️ Register</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <div class="container">
+
+        <!-- Breadcrumbs -->
+        <div class="breadcrumb">
+            <a href="{% url 'book_list' %}">Home</a> &gt; <span>Books</span> &gt; <span>{{ book.title }}</span>
+        </div>
+
+        <!-- Messages Notifications -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Product Details Card -->
+        <div class="product-card">
+            <!-- Left: Book Cover Image -->
+            <div class="product-media">
+                {% if book.image %}
+                    <img src="{{ book.image.url }}" alt="{{ book.title }}" class="product-image">
+                {% else %}
+                    <div class="no-image-box">
+                        📖 No Cover Image
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Right: Book Specifications -->
+            <div class="product-info">
+                <h1>{{ book.title }}</h1>
+                <div class="author-line">
+                    By <strong>{{ book.author.name }}</strong>
+                </div>
+
+                <!-- Rating Strip -->
+                <div class="rating-header-strip">
+                    <span class="stars-display">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= avg_rating %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                    </span>
+                    <span class="rating-number">
+                        {% if total_reviews > 0 %}
+                            {{ avg_rating }} / 5
+                        {% else %}
+                            Not rated yet
+                        {% endif %}
+                    </span>
+                    <a href="#reviews" class="reviews-count-badge">
+                        ({{ total_reviews }} review{{ total_reviews|pluralize }})
+                    </a>
+                </div>
+
+                <div class="price-tag">
+                    ₹{{ book.price }}
+                </div>
+
+                <table class="product-meta-table">
+                    <tr>
+                        <td class="meta-label">ISBN Number:</td>
+                        <td>{{ book.isbn_number }}</td>
+                    </tr>
+                    <tr>
+                        <td class="meta-label">Author Email:</td>
+                        <td>{{ book.author.email }}</td>
+                    </tr>
+                    {% if book.published_date %}
+                    <tr>
+                        <td class="meta-label">Published Date:</td>
+                        <td>{{ book.published_date }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td class="meta-label">Availability:</td>
+                        <td>
+                            {% if book.available %}
+                                <span class="badge-available">✓ In Stock</span>
+                            {% else %}
+                                <span class="badge-unavailable">✗ Out of Stock</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="action-buttons">
+                    {% if book.available %}
+                        <a href="{% url 'add_to_cart' book.id %}" class="btn btn-success">
+                            🛒 Add to Cart
+                        </a>
+                        <a href="{% url 'cart' %}" class="btn btn-primary">
+                            ⚡ Go to Cart
+                        </a>
+                    {% else %}
+                        <button class="btn btn-outline" disabled>Currently Unavailable</button>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        {% if is_in_wishlist %}
+                            <a href="{% url 'toggle_wishlist' book.id %}" class="btn btn-outline" style="border-color: #e11d48; color: #e11d48; background: #fff1f2;">
+                                ❤️ In Wishlist (Remove)
+                            </a>
+                        {% else %}
+                            <a href="{% url 'toggle_wishlist' book.id %}" class="btn btn-outline" style="border-color: #e11d48; color: #e11d48;">
+                                🤍 Add to Wishlist
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-outline" style="border-color: #e11d48; color: #e11d48;">
+                            🤍 Add to Wishlist
+                        </a>
+                    {% endif %}
+                    <a href="#reviews" class="btn btn-outline">
+                        💬 Reviews ({{ total_reviews }})
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews & Ratings Section -->
+        <section class="reviews-section" id="reviews">
+            <div class="section-title">
+                <span>Customer Reviews & Ratings</span>
+                <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">
+                    {{ total_reviews }} Total Review{{ total_reviews|pluralize }}
+                </span>
+            </div>
+
+            <!-- Rating Overview & Star Breakdown -->
+            <div class="rating-overview-grid">
+                <div class="overall-score-card">
+                    <div class="score-large">
+                        {% if total_reviews > 0 %}{{ avg_rating }}{% else %}0.0{% endif %}
+                    </div>
+                    <div class="score-stars">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= avg_rating %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="score-subtitle">
+                        {% if total_reviews > 0 %}
+                            Based on {{ total_reviews }} verified review{{ total_reviews|pluralize }}
+                        {% else %}
+                            No reviews yet
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="breakdown-list">
+                    {% for item in star_breakdown %}
+                    <div class="breakdown-row">
+                        <span class="breakdown-label">{{ item.star }} Star{{ item.star|pluralize }}</span>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" style="width: {{ item.percent }}%;"></div>
+                        </div>
+                        <span class="breakdown-count">{{ item.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- REVIEW ELIGIBILITY & SUBMISSION BLOCK -->
+            {% if user.is_authenticated %}
+                {% if user_review %}
+                    <!-- User already has a review: show their review with Edit/Delete options -->
+                    <div class="my-review-card">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+                            <div>
+                                <span class="my-review-badge">Your Review</span>
+                                <div class="review-stars">
+                                    {{ user_review.star_display }} ({{ user_review.rating }}/5 Stars)
+                                </div>
+                            </div>
+                            <div class="review-actions" style="margin-top: 0;">
+                                <a href="{% url 'edit_review' user_review.id %}" class="btn btn-outline btn-sm">
+                                    ✏️ Edit My Review
+                                </a>
+                                <a href="{% url 'delete_review' user_review.id %}" class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Are you sure you want to delete your review?');">
+                                    🗑️ Delete Review
+                                </a>
+                            </div>
+                        </div>
+                        <div class="review-content" style="margin-top: 10px;">
+                            {{ user_review.review|linebreaks }}
+                        </div>
+                        <div class="review-date" style="margin-top: 8px;">
+                            Last updated: {{ user_review.updated_at|date:"M d, Y" }}
+                        </div>
+                    </div>
+
+                {% elif has_purchased %}
+                    <!-- User has purchased and has NOT reviewed yet: show review form -->
+                    <div class="review-box-card verified">
+                        <div class="review-box-header">
+                            <span>⭐ Write a Customer Review</span>
+                            <span class="verified-badge">✓ Verified Purchaser</span>
+                        </div>
+                        <p style="font-size: 13px; color: #166534; margin-bottom: 16px;">
+                            You purchased this item! Share your honest feedback with other readers.
+                        </p>
+
+                        <form method="POST" action="{% url 'add_review' book.id %}" id="review-form">
+                            {% csrf_token %}
+
+                            <div class="form-group">
+                                <label class="form-label">Your Rating (1 to 5 Stars):</label>
+                                <!-- Interactive Clickable Stars -->
+                                <div class="interactive-stars" id="star-selector">
+                                    <span class="interactive-star active" data-value="1">★</span>
+                                    <span class="interactive-star active" data-value="2">★</span>
+                                    <span class="interactive-star active" data-value="3">★</span>
+                                    <span class="interactive-star active" data-value="4">★</span>
+                                    <span class="interactive-star active" data-value="5">★</span>
+                                </div>
+                                <select name="rating" id="rating-input" class="rating-select" required>
+                                    <option value="5" selected>5 Stars - Excellent</option>
+                                    <option value="4">4 Stars - Very Good</option>
+                                    <option value="3">3 Stars - Good</option>
+                                    <option value="2">2 Stars - Fair</option>
+                                    <option value="1">1 Star - Poor</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="review-text" class="form-label">Your Written Review:</label>
+                                <textarea name="review" id="review-text" rows="4" class="form-control"
+                                    placeholder="What did you think of the writing style, plot, quality, or condition?"
+                                    required></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-success">
+                                ✍️ Submit Review
+                            </button>
+                        </form>
+                    </div>
+
+                {% else %}
+                    <!-- Logged in, but has not purchased -->
+                    <div class="alert alert-info">
+                        <div>
+                            <strong>🔒 Verified Purchase Required:</strong>
+                            Only customers who have purchased <em>{{ book.title }}</em> can write a review. Once you order this book, you'll be able to leave your rating and review here!
+                        </div>
+                    </div>
+                {% endif %}
+
+            {% else %}
+                <!-- Not logged in -->
+                <div class="alert alert-warning">
+                    <div>
+                        <strong>Have you purchased this product?</strong>
+                        Please <a href="{% url 'login' %}?next={{ request.path }}#reviews" style="color: #b45309; font-weight: bold; text-decoration: underline;">Log In</a> to leave your rating and review. (Verified purchase required).
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- CUSTOMER REVIEWS LIST -->
+            <div class="reviews-list">
+                {% for review in reviews %}
+                    <div class="review-card" id="review-{{ review.id }}">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <div class="user-avatar">
+                                    {{ review.user.username|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <div class="reviewer-name">
+                                        {{ review.user.username }}
+                                        <span class="verified-badge">✓ Verified Purchase</span>
+                                    </div>
+                                    <div class="review-date">
+                                        {{ review.created_at|date:"F d, Y" }}
+                                        {% if review.updated_at != review.created_at %}
+                                            <span style="font-style: italic;">(Edited)</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- User or Admin Actions -->
+                            {% if user.is_authenticated %}
+                                {% if user == review.user or user.is_staff or user.is_superuser %}
+                                    <div class="review-actions">
+                                        {% if user == review.user or user.is_superuser %}
+                                            <a href="{% url 'edit_review' review.id %}" class="btn btn-outline btn-sm">
+                                                ✏️ Edit
+                                            </a>
+                                        {% endif %}
+                                        <a href="{% url 'delete_review' review.id %}" class="btn btn-danger btn-sm"
+                                           onclick="return confirm('Are you sure you want to delete this review?');">
+                                            🗑️ Delete
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Star Rating -->
+                        <div class="review-stars">
+                            {{ review.star_display }}
+                            <span style="color: var(--text-dark); font-size: 13px; font-weight: 600; margin-left: 6px;">
+                                {{ review.rating }}/5 Stars
+                            </span>
+                        </div>
+
+                        <!-- Review Text -->
+                        <div class="review-content">
+                            {{ review.review|linebreaks }}
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="empty-reviews">
+                        <div class="empty-icon">📖⭐</div>
+                        <h3 style="color: #334155; margin-bottom: 6px;">No reviews yet</h3>
+                        <p>Be the first verified purchaser to rate and review this book!</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- JavaScript for Interactive 5-Star Selection -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const selector = document.getElementById('star-selector');
+            const selectField = document.getElementById('rating-input');
+
+            if (selector && selectField) {
+                const stars = selector.querySelectorAll('.interactive-star');
+
+                function updateStars(val) {
+                    stars.forEach(star => {
+                        const starVal = parseInt(star.getAttribute('data-value'), 10);
+                        if (starVal <= val) {
+                            star.classList.add('active');
+                            star.textContent = '★';
+                        } else {
+                            star.classList.remove('active');
+                            star.textContent = '☆';
+                        }
+                    });
+                }
+
+                stars.forEach(star => {
+                    star.addEventListener('click', function() {
+                        const val = parseInt(this.getAttribute('data-value'), 10);
+                        selectField.value = val;
+                        updateStars(val);
+                    });
+
+                    star.addEventListener('mouseenter', function() {
+                        const val = parseInt(this.getAttribute('data-value'), 10);
+                        updateStars(val);
+                    });
+                });
+
+                selector.addEventListener('mouseleave', function() {
+                    const currentVal = parseInt(selectField.value, 10) || 5;
+                    updateStars(currentVal);
+                });
+
+                // Initialize to 5 stars
+                updateStars(parseInt(selectField.value, 10) || 5);
+            }
+        });
+    </script>
+</body>
+</html>

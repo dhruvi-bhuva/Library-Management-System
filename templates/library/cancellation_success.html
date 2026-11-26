@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancellation Confirmed - Library Management System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
+            margin: 0;
+            padding: 40px 15px;
+            color: #1e293b;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 35px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .icon-circle {
+            width: 70px;
+            height: 70px;
+            background: #fee2e2;
+            color: #dc2626;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 20px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #0f172a;
+            margin: 0 0 10px;
+        }
+        .subtitle {
+            color: #64748b;
+            font-size: 15px;
+            margin: 0 0 25px;
+            line-height: 1.5;
+        }
+        .details-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 25px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+        .detail-label {
+            color: #64748b;
+        }
+        .detail-val {
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .badge-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .badge-refund-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .badge-na {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .refund-info-box {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+            text-align: left;
+            margin-bottom: 25px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .btn-primary {
+            background: #0d6efd;
+            color: white;
+            text-decoration: none;
+            padding: 12px 22px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover {
+            background: #0b5ed7;
+        }
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #334155;
+            text-decoration: none;
+            padding: 12px 22px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="icon-circle">
+            ✕
+        </div>
+
+        <h1>Order Cancelled Successfully</h1>
+        <p class="subtitle">
+            Your order <strong>#{{ order.order_id|stringformat:"s"|slice:":8" }}</strong> has been cancelled.
+        </p>
+
+        <div class="details-box">
+            <div class="detail-row">
+                <span class="detail-label">Order ID:</span>
+                <span class="detail-val" style="font-family: monospace;">{{ order.order_id }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Order Status:</span>
+                <span class="detail-val">
+                    <span class="badge badge-cancelled">{{ order.get_order_status_display }}</span>
+                </span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Payment Method:</span>
+                <span class="detail-val">{{ order.get_payment_method_display }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Cancellation Status:</span>
+                <span class="detail-val">
+                    <span class="badge badge-cancelled">{{ order.get_cancellation_status_display }}</span>
+                </span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Refund Status:</span>
+                <span class="detail-val">
+                    {% if order.refund_status == 'REFUND_PENDING' %}
+                        <span class="badge badge-refund-pending">⏳ {{ order.get_refund_status_display }}</span>
+                    {% elif order.refund_status == 'REFUNDED' %}
+                        <span class="badge" style="background:#d1fae5; color:#065f46;">✔ Refunded</span>
+                    {% else %}
+                        <span class="badge badge-na">{{ order.get_refund_status_display }}</span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Cancelled At:</span>
+                <span class="detail-val">{{ order.cancelled_at|date:"M d, Y h:i A"|default:"Just now" }}</span>
+            </div>
+            {% if order.cancellation_reason %}
+                <div class="detail-row" style="border-top: 1px dashed #e2e8f0; padding-top: 8px; margin-top: 8px;">
+                    <span class="detail-label">Reason:</span>
+                    <span class="detail-val" style="font-weight: normal; color: #475569;">{{ order.cancellation_reason }}</span>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if order.payment_method == 'ONLINE' and order.refund_status == 'REFUND_PENDING' %}
+            <div class="refund-info-box">
+                💳 <strong>Refund Details:</strong><br>
+                A refund of <strong>₹{{ order.total_amount }}</strong> has been initiated to your original payment method. Depending on your bank, it typically reflects within 5–7 business days.
+            </div>
+        {% elif order.payment_method == 'COD' %}
+            <div class="refund-info-box" style="background: #f8fafc; border-color: #cbd5e1; color: #475569;">
+                💵 <strong>Cash on Delivery:</strong><br>
+                No payment was processed upfront. The order has been cancelled and delivery has been stopped.
+            </div>
+        {% endif %}
+
+        <div class="btn-group">
+            <a href="{% url 'order_history' %}" class="btn-primary">
+                📦 View Order History
+            </a>
+            <a href="{% url 'book_list' %}" class="btn-secondary">
+                📚 Browse Books
+            </a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
