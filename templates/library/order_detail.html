@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - Library Management System</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px 15px;
+            color: #333;
+        }
+        .container { max-width: 850px; margin: 0 auto; }
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        .nav-links a:hover { color: #0d6efd; }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 18px;
+            font-size: 20px;
+            color: #111;
+            border-bottom: 2px solid #f1f3f5;
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        h1 {
+            color: #1e293b;
+            margin: 0 0 25px;
+            font-size: 26px;
+        }
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .badge-placed { background: #dbeafe; color: #1e40af; }
+        .badge-processing { background: #fef3c7; color: #92400e; }
+        .badge-shipped { background: #e0e7ff; color: #3730a3; }
+        .badge-delivered { background: #d1fae5; color: #065f46; }
+        .badge-cancelled { background: #fee2e2; color: #991b1b; }
+        .badge-cancellation-requested { background: #fed7aa; color: #9a3412; }
+        .badge-paid { background: #d1fae5; color: #065f46; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-failed { background: #fee2e2; color: #991b1b; }
+        .badge-refund-pending { background: #fed7aa; color: #9a3412; }
+        .badge-refunded { background: #e2e8f0; color: #475569; }
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        @media (max-width: 600px) {
+            .details-grid { grid-template-columns: 1fr; }
+        }
+        .details-grid strong { color: #0f172a; }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .items-table th {
+            background: #f1f5f9;
+            text-align: left;
+            padding: 12px;
+            font-size: 13px;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .items-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+        .book-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .book-cell img {
+            width: 45px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .book-cell .no-img {
+            width: 45px;
+            height: 60px;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            color: #64748b;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .totals-summary {
+            text-align: right;
+            padding: 15px 0;
+            border-top: 2px solid #e2e8f0;
+        }
+        .total-amount {
+            font-size: 22px;
+            font-weight: bold;
+            color: #198754;
+        }
+        .cancel-section {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .cancel-section strong { color: #991b1b; }
+        .refund-section {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-top: 12px;
+        }
+        .actions-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 22px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #0d6efd; color: white; }
+        .btn-primary:hover { background: #0b5ed7; }
+        .btn-secondary { background: #222; color: white; }
+        .btn-secondary:hover { background: #444; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #bb2d3b; }
+        .btn-outline { background: white; color: #475569; border: 1px solid #cbd5e1; }
+        .btn-outline:hover { background: #f8fafc; color: #0f172a; }
+        @media print {
+            body { background: white; padding: 0; }
+            .actions-row, .top-nav { display: none !important; }
+            .card { box-shadow: none; border: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-nav">
+        <div class="nav-links">
+            <a href="{% url 'order_history' %}">← My Orders</a>
+            <a href="{% url 'book_list' %}">📚 Books</a>
+            <a href="{% url 'cart' %}">🛒 Cart</a>
+        </div>
+        <div style="font-size: 13px; color: #64748b;">🎓 College Demo</div>
+    </div>
+
+    <h1>📋 Order Details</h1>
+
+    <!-- Order Info & Status -->
+    <div class="card">
+        <h2>📍 Order Information</h2>
+        <div class="details-grid">
+            <div>
+                <strong>Order ID:</strong><br>
+                <span style="font-family: monospace; font-size: 13px;">{{ order.order_id }}</span><br><br>
+                <strong>Customer Name:</strong> {{ order.customer_name }}<br>
+                <strong>Mobile:</strong> {{ order.mobile }}<br>
+                {% if order.customer_email %}
+                    <strong>Email:</strong> {{ order.customer_email }}<br>
+                {% endif %}
+                <strong>Placed:</strong> {{ order.created_at|date:"M d, Y h:i A" }}
+            </div>
+            <div>
+                <strong>Shipping Address:</strong><br>
+                {{ order.address }}<br>
+                {{ order.city }}, {{ order.state }} - {{ order.pincode }}<br><br>
+                <strong>Payment Method:</strong>
+                {% if order.payment_method == 'ONLINE' %}
+                    Razorpay Online (Test Mode)
+                {% else %}
+                    Cash on Delivery (COD)
+                {% endif %}<br>
+                <strong>Payment Status:</strong>
+                {% if order.payment_status == 'PAID' %}
+                    <span class="badge badge-paid">✔ Paid</span>
+                {% elif order.payment_status == 'PENDING' %}
+                    <span class="badge badge-pending">⏳ Pending</span>
+                {% elif order.payment_status == 'REFUND_PENDING' %}
+                    <span class="badge badge-refund-pending">↩ Refund Pending</span>
+                {% elif order.payment_status == 'REFUNDED' %}
+                    <span class="badge badge-refunded">↩ Refunded</span>
+                {% else %}
+                    <span class="badge badge-failed">{{ order.get_payment_status_display }}</span>
+                {% endif %}<br>
+                <strong>Order Status:</strong>
+                {% if order.order_status == 'PLACED' %}
+                    <span class="badge badge-placed">📦 Placed</span>
+                {% elif order.order_status == 'PROCESSING' %}
+                    <span class="badge badge-processing">⚙️ Processing</span>
+                {% elif order.order_status == 'SHIPPED' %}
+                    <span class="badge badge-shipped">🚚 Shipped</span>
+                {% elif order.order_status == 'DELIVERED' %}
+                    <span class="badge badge-delivered">✅ Delivered</span>
+                {% elif order.order_status == 'CANCELLED' %}
+                    <span class="badge badge-cancelled">❌ Cancelled</span>
+                {% elif order.order_status == 'CANCELLATION_REQUESTED' %}
+                    <span class="badge badge-cancellation-requested">⏳ Cancellation Requested</span>
+                {% endif %}
+
+                {% if order.razorpay_payment_id %}
+                    <br><span style="font-size: 12px; color: #64748b;">
+                        Razorpay Payment: <code>{{ order.razorpay_payment_id }}</code>
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Items -->
+    <div class="card">
+        <h2>📚 Ordered Books</h2>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Book</th>
+                    <th>Price</th>
+                    <th style="text-align: center;">Qty</th>
+                    <th style="text-align: right;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>
+                            <div class="book-cell">
+                                {% if item.book and item.book.image %}
+                                    <img src="{{ item.book.image.url }}" alt="{{ item.book_title }}">
+                                {% elif item.book_image %}
+                                    <img src="/media/{{ item.book_image }}" alt="{{ item.book_title }}">
+                                {% else %}
+                                    <div class="no-img">No Image</div>
+                                {% endif %}
+                                <div>
+                                    <strong>{{ item.book_title }}</strong>
+                                    {% if item.book and item.book.author %}
+                                        <div style="font-size: 12px; color: #64748b;">by {{ item.book.author.name }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>₹{{ item.price }}</td>
+                        <td style="text-align: center;">{{ item.quantity }}</td>
+                        <td style="text-align: right; font-weight: bold;">₹{{ item.subtotal }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="totals-summary">
+            <div style="font-size: 14px; color: #64748b; margin-bottom: 5px;">
+                Shipping: <span style="color: #059669; font-weight: bold;">FREE</span>
+            </div>
+            <div>
+                <span style="font-size: 16px; font-weight: bold; margin-right: 15px;">Total Amount:</span>
+                <span class="total-amount">₹{{ order.total_amount }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancellation Info (if cancelled) -->
+    {% if order.order_status == 'CANCELLED' %}
+        <div class="card">
+            <h2>❌ Cancellation Details</h2>
+            <div class="cancel-section">
+                <strong>Cancelled At:</strong> {{ order.cancelled_at|date:"M d, Y h:i A" }}<br>
+                {% if order.cancellation_reason %}
+                    <strong>Reason:</strong> {{ order.cancellation_reason }}<br>
+                {% endif %}
+                <strong>Refund Status:</strong>
+                {% if order.refund_status == 'NOT_APPLICABLE' %}
+                    Not Applicable (COD)
+                {% elif order.refund_status == 'PENDING' %}
+                    ⏳ Pending
+                {% elif order.refund_status == 'PROCESSING' %}
+                    ⚙️ Processing
+                {% elif order.refund_status == 'COMPLETED' %}
+                    ✅ Completed
+                {% elif order.refund_status == 'FAILED' %}
+                    ❌ Failed
+                {% endif %}
+                {% if order.refund_id %}
+                    <br><strong>Refund Reference:</strong> <code>{{ order.refund_id }}</code>
+                {% endif %}
+            </div>
+
+            {% if order.payment_method == 'ONLINE' and order.refund_status != 'NOT_APPLICABLE' %}
+                <div class="refund-section">
+                    💰 <strong>Refund Information:</strong><br>
+                    {% if order.refund_status == 'PENDING' or order.refund_status == 'PROCESSING' %}
+                        Your refund of ₹{{ order.total_amount }} is being processed.
+                        It may take 5-7 business days to reflect in your account.
+                        In test mode, this is simulated — no real money was charged.
+                    {% elif order.refund_status == 'COMPLETED' %}
+                        ✅ Your refund of ₹{{ order.total_amount }} has been completed.
+                    {% elif order.refund_status == 'FAILED' %}
+                        ⚠️ Refund processing failed. Please contact support.
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="actions-row">
+        {% if order.is_cancellable %}
+            <a href="{% url 'cancel_confirm' order.order_id %}" class="btn btn-danger">❌ Cancel Order</a>
+        {% endif %}
+        <button class="btn btn-outline" onclick="window.print()">🖨️ Print</button>
+        <a href="{% url 'order_history' %}" class="btn btn-primary">📦 All Orders</a>
+        <a href="{% url 'book_list' %}" class="btn btn-secondary">← Browse Books</a>
+    </div>
+</div>
+
+</body>
+</html>
